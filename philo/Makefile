@@ -1,8 +1,12 @@
 NAME	= philo
 CC		= gcc
 CFLAGS	= -Wall -Wextra -Werror
+
 SRCS	= philosophers.c \
-		  src.c
+		  arg_error_check.c \
+		  src.c \
+		  philo_action.c
+
 OBJS	= $(SRCS:.c=.o)
 HEAD	= philosophers.h
 
