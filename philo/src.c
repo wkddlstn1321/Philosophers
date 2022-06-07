@@ -3,11 +3,9 @@
 unsigned int	time_rc(void)
 {
 	struct timeval	time;
-	unsigned int	t;
 
 	gettimeofday(&time, NULL);
-	t = (time.tv_sec * 1000) + (time.tv_usec / 1000);
-	return (t);
+	return ((time.tv_sec * 1000) + (time.tv_usec * 0.001));
 }
 
 void	prin_act(unsigned int t, t_philo *phi, char *str)

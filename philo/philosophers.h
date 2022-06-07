@@ -13,14 +13,14 @@ typedef struct p_philo{
 	unsigned int	left;
 	unsigned int	right;
 	unsigned int	eat_cnt;
-	unsigned int	dead_cnt;
+	unsigned int	dead;
 	pthread_t		philo;
 	t_info			*info;
 }t_philo;
 
 typedef struct p_info{
 	unsigned int	p_arg[5];
-	unsigned int	what_time_is_it_now;
+	unsigned int	time;
 	t_pmt			write;
 	t_pmt			*fork;
 	t_philo			*phi;

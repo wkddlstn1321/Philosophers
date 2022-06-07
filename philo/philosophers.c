@@ -2,7 +2,7 @@
 
 int	r_t(t_philo *phi)
 {
-	while (phi->dead_cnt > 0)
+	while (phi->dead > 0)
 	{
 		philo_eat(phi);
 		philo_sleep(phi);
@@ -16,6 +16,7 @@ int	thread_create(t_info *info)
 	int	i;
 
 	i = 0;
+	info->time = time_rc();
 	while (i < info->p_arg[0])
 	{
 		if (pthread_create(info->phi[i].philo, NULL, &r_t, &info->phi[i]) != 0)
@@ -41,7 +42,7 @@ int	info_init(t_info *info)
 		if (info->phi[i].right == info->p_arg[0])
 			info->phi[i].right = 0;
 		info->phi[i].eat_cnt = 0;
-		info->phi[i].dead_cnt = 0;
+		info->phi[i].dead = 0;
 		info->phi[i].info = info;
 		i++;
 	}
