@@ -1,21 +1,21 @@
 #include"philosophers.h"
 
-unsigned int	time_rc(void)
+unsigned int	ms_time(void)
 {
 	struct timeval	time;
 
 	gettimeofday(&time, NULL);
-	return ((time.tv_sec * 1000) + (time.tv_usec * 0.001));
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void	prin_act(unsigned int t, t_philo *phi, char *str)
+void	print_act(t_philo *phi, char *str)
 {
 	pthread_mutex_lock(&phi->info->write);
-	printf("%d %d %s\n", t, phi->left, str);
+	printf("%d %d %s\n", ms_time() - phi->info->time, phi->left + 1, str);
 	pthread_mutex_unlock(&phi->info->write);
 }
 
-int	prin_error(void)
+int	print_error(void)
 {
 	printf("error! error!!!!\n");
 	return (1);
@@ -31,7 +31,7 @@ int	ft_strlen(const char *s)
 	return (i);
 }
 
-unsigned long long	ft_atoi(const char *str)
+long long	ft_atoi(const char *str)
 {
 	int					i;
 	unsigned long long	atoi;

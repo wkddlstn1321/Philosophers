@@ -5,7 +5,7 @@ CFLAGS	= -Wall -Wextra -Werror
 SRCS	= philosophers.c \
 		  arg_error_check.c \
 		  src.c \
-		  philo_action.c
+		  src2.c
 
 OBJS	= $(SRCS:.c=.o)
 HEAD	= philosophers.h
