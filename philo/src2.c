@@ -1,54 +1,50 @@
 #include"philosophers.h"
 
-void	philo_eat(t_philo *phi)
+void	philo_eat(t_philo *phi, int i, int j)
 {
-	unsigned int	start;
-	int				info_time;
+	int	start;
 
-	info_time = phi->info->time;
-	pthread_mutex_lock(&phi->info->fork[phi->left]);
+	pthread_mutex_lock(&phi->info->fork[i]);
 	print_act(phi, "has taken a fork");
-	pthread_mutex_lock(&phi->info->fork[phi->right]);
+	pthread_mutex_lock(&phi->info->fork[j]);
 	print_act(phi, "has taken a fork");
 	print_act(phi, "is eating");
+	phi->last_eat_time = ms_time();
 	start = ms_time();
 	while (!phi->info->die_flag)
 	{
-		if (ms_time() - start <= phi->info->p_arg[2])
+		if (ms_time() - start >= phi->info->time_to_eat)
 		{
 			if (phi->info->must_eat != -1)
 				phi->eat_cnt++;
-			phi->life_time = ms_time();
 			break ;
 		}
 	}
-	pthread_mutex_unlock(&phi->info->fork[phi->left]);
-	pthread_mutex_unlock(&phi->info->fork[phi->right]);
+	pthread_mutex_unlock(&phi->info->fork[i]);
+	pthread_mutex_unlock(&phi->info->fork[j]);
 }
 
 void	philo_sleep(t_philo *phi)
 {
-	unsigned int	start;
-	int				info_time;
+	int	start;
 
-	info_time = phi->info->time;
 	print_act(phi, "is sleeping");
 	start = ms_time();
 	while (!phi->info->die_flag)
 	{
-		if (ms_time() - start <= phi->info->p_arg[3])
+		if (ms_time() - start >= phi->info->time_to_sleep)
 			break ;
 	}
 }
 
 static int	must_eat_check(t_info *info)
 {
-	unsigned int	i;
+	int	i;
 
 	i = 0;
-	while (info->must_eat <= (int)info->phi[i].eat_cnt)
+	while (info->must_eat <= info->phi[i].eat_cnt)
 		i++;
-	if (i == info->p_arg[0])
+	if (i == info->num)
 	{
 		info->die_flag = 1;
 		return (1);
@@ -58,21 +54,28 @@ static int	must_eat_check(t_info *info)
 
 void	end_check(t_info *info)
 {
-	unsigned int	i;
+	int	i;
 
-	i = 0;
-	while (i < info->p_arg[0])
+	while (1)
 	{
-		if (must_eat_check(info))
-			return ;
-		if (info->phi[i].life_time - ms_time() <= info->p_arg[1])
+		i = 0;
+		while (i < info->num)
 		{
-			print_act(&info->phi[i], "is died");
-			info->die_flag = 1;
-			break ;
+			if (info->must_eat != -1)
+			{
+				if (must_eat_check(info))
+					return ;
+			}
+			if (info->phi[i].last_eat_time > 0)
+			{
+				if (ms_time() - info->phi[i].last_eat_time >= info->time_to_die)
+				{
+					print_act(&info->phi[i], "is died");
+					info->die_flag = 1;
+					return ;
+				}
+			}
+			i++;
 		}
-		i++;
-		if (i == info->p_arg[0])
-			i = 0;
 	}
 }

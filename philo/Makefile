@@ -1,7 +1,6 @@
 NAME	= philo
 CC		= gcc
 CFLAGS	= -Wall -Wextra -Werror
-
 SRCS	= philosophers.c \
 		  arg_error_check.c \
 		  src.c \
