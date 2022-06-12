@@ -35,15 +35,16 @@ void	*rt(void *v_phi)
 	j = phi->right;
 	if (phi->left % 2)
 	{
+		usleep(50);
 		i = phi->right;
 		j = phi->left;
-		usleep(5 * phi->info->num);
 	}
 	while (!phi->info->die_flag)
 	{
 		philo_eat(phi, i, j);
 		philo_sleep(phi);
 		print_act(phi, "is thinking");
+		usleep(50);
 	}
 	return (0);
 }
@@ -77,5 +78,7 @@ int	main(int argc, char **argv)
 	if (thread_create(&info))
 		return (0);
 	end_check(&info);
+	if (info.num == 1)
+		pthread_mutex_unlock(&info.fork[0]);
 	thread_free(&info);
 }
