@@ -19,6 +19,7 @@ void	philo_eat(t_philo *phi, int i, int j)
 				phi->eat_cnt++;
 			break ;
 		}
+		usleep(50);
 	}
 	pthread_mutex_unlock(&phi->info->fork[i]);
 	pthread_mutex_unlock(&phi->info->fork[j]);
@@ -34,6 +35,7 @@ void	philo_sleep(t_philo *phi)
 	{
 		if (ms_time() - start >= phi->info->time_to_sleep)
 			break ;
+		usleep(50);
 	}
 }
 
@@ -77,5 +79,6 @@ void	end_check(t_info *info)
 			}
 			i++;
 		}
+		usleep(50);
 	}
 }

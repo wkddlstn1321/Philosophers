@@ -44,7 +44,8 @@ void	*rt(void *v_phi)
 		philo_eat(phi, i, j);
 		philo_sleep(phi);
 		print_act(phi, "is thinking");
-		usleep(50);
+		if (phi->info->num % 2)
+			usleep(50);
 	}
 	return (0);
 }
@@ -75,6 +76,12 @@ int	main(int argc, char **argv)
 	info.phi = NULL;
 	if (arg_check(argc, argv, &info))
 		return (0);
+	if (info.must_eat == 0)
+	{
+		free(info.phi);
+		free(info.fork);
+		return (0);
+	}
 	if (thread_create(&info))
 		return (0);
 	end_check(&info);
