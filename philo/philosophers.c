@@ -24,28 +24,22 @@ void	thread_free(t_info *info)
 void	*rt(void *v_phi)
 {
 	t_philo	*phi;
-	int		i;
-	int		j;
 
 	phi = (t_philo *)v_phi;
 	while (phi->info->all_sit_flag)
 		;
 	phi->last_eat_time = phi->info->start_time;
-	i = phi->left;
-	j = phi->right;
 	if (phi->left % 2)
-	{
-		usleep(50);
-		i = phi->right;
-		j = phi->left;
-	}
+		usleep((phi->info->time_to_eat - 10) * 1000);
 	while (!phi->info->die_flag)
 	{
-		philo_eat(phi, i, j);
+		philo_eat(phi);
+		if (phi->info->die_flag)
+			return (0);
 		philo_sleep(phi);
+		if (phi->info->die_flag)
+			return (0);
 		print_act(phi, "is thinking");
-		if (phi->info->num % 2)
-			usleep(50);
 	}
 	return (0);
 }
@@ -63,7 +57,7 @@ int	thread_create(t_info *info)
 		i++;
 		usleep(50);
 	}
-	info->start_time = ms_time();
+	info->start_time = get_time();
 	info->all_sit_flag = 0;
 	return (0);
 }

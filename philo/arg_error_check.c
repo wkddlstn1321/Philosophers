@@ -1,6 +1,6 @@
 #include"philosophers.h"
 
-int	info_init(t_info *info)
+static int	info_init(t_info *info)
 {
 	int	i;
 
@@ -29,7 +29,7 @@ int	info_init(t_info *info)
 
 static int	range_check(char *str)
 {
-	long long	num;
+	long	num;
 
 	if (ft_strlen(str) > 10)
 		return (1);
@@ -53,6 +53,8 @@ int	arg_check(int ac, char **av, t_info *info)
 		i++;
 	}
 	info->num = ft_atoi(av[1]);
+	if (info->num < 1)
+		return (print_error(info));
 	info->time_to_die = ft_atoi(av[2]);
 	info->time_to_eat = ft_atoi(av[3]);
 	info->time_to_sleep = ft_atoi(av[4]);
