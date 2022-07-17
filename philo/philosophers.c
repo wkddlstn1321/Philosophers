@@ -30,7 +30,7 @@ void	*rt(void *v_phi)
 		;
 	phi->last_eat_time = phi->info->start_time;
 	if (phi->left % 2)
-		usleep((phi->info->time_to_eat - 10) * 1000);
+		usleep(50);
 	while (!phi->info->die_flag)
 	{
 		philo_eat(phi);
