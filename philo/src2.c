@@ -56,31 +56,41 @@ static int	must_eat_check(t_info *info)
 	return (0);
 }
 
-void	end_check(t_info *info)
+static void	print_die(t_philo *phi)
 {
-	int	i;
+	long	t;
 
-	while (1)
+	t = phi->info->start_time;
+	pthread_mutex_lock(&phi->info->write);
+	phi->info->die_flag = 1;
+	printf("%ld %d is died\n", get_time() - t, phi->left + 1);
+	pthread_mutex_unlock(&phi->info->write);
+}
+
+int	end_check(t_info *info)
+{
+	int		i;
+	long	die_t;
+
+	i = 0;
+	die_t = info->time_to_die;
+	while (i < info->num)
 	{
-		i = 0;
-		while (i < info->num)
+		if (info->must_eat != -1)
 		{
-			if (info->must_eat != -1)
-			{
-				if (must_eat_check(info))
-					return ;
-			}
-			if (info->phi[i].last_eat_time > 0)
-			{
-				if (get_time() - info->phi[i].last_eat_time >= info->time_to_die)
-				{
-					print_act(&info->phi[i], "is died");
-					info->die_flag = 1;
-					return ;
-				}
-			}
-			i++;
+			if (must_eat_check(info))
+				return (0);
 		}
-		usleep(50);
+		if (info->phi[i].last_eat_time > 0)
+		{
+			if (get_time() - info->phi[i].last_eat_time >= die_t)
+			{
+				print_die(&info->phi[i]);
+				return (0);
+			}
+		}
+		i++;
 	}
+	usleep(50);
+	return (1);
 }

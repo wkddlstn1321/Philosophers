@@ -52,5 +52,5 @@ long		ft_atoi(const char *str);
 void		print_act(t_philo *phi, char *str);
 void		philo_eat(t_philo *phi);
 void		philo_sleep(t_philo *phi);
-void		end_check(t_info *info);
+int			end_check(t_info *info);
 #endif

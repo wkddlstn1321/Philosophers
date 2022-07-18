@@ -43,8 +43,8 @@ void	*rt(void *v_phi)
 	phi->last_eat_time = phi->info->start_time;
 	if (phi->left % 2)
 	{
-		if (phi->info->time_to_eat < 10)
-			usleep(phi->info->time_to_eat * 1000);
+		if (phi->info->time_to_eat <= 10)
+			usleep(phi->info->time_to_eat * 900);
 		else
 			usleep((phi->info->time_to_eat - 10) * 1000);
 	}
@@ -95,7 +95,8 @@ int	main(int argc, char **argv)
 	}
 	if (thread_create(&info))
 		return (0);
-	end_check(&info);
+	while (end_check(&info))
+		;
 	if (info.num == 1)
 		pthread_mutex_unlock(&info.fork[0]);
 	thread_free(&info);
