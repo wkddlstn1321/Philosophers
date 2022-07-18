@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: insjang <insjang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/07/18 15:48:48 by insjang           #+#    #+#             */
+/*   Updated: 2022/07/18 15:48:49 by insjang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include"philosophers.h"
 
 void	thread_free(t_info *info)
@@ -30,7 +42,12 @@ void	*rt(void *v_phi)
 		;
 	phi->last_eat_time = phi->info->start_time;
 	if (phi->left % 2)
-		usleep(50);
+	{
+		if (phi->info->time_to_eat < 10)
+			usleep(phi->info->time_to_eat * 1000);
+		else
+			usleep((phi->info->time_to_eat - 10) * 1000);
+	}
 	while (!phi->info->die_flag)
 	{
 		philo_eat(phi);
