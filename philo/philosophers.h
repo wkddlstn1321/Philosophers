@@ -45,7 +45,7 @@ typedef struct p_info{
 }t_info;
 
 long		get_time(void);
-int			print_error(t_info *info);
+int			print_error(t_info *info, int i);
 int			ft_strlen(const char *s);
 int			arg_check(int ac, char **av, t_info *phil);
 long		ft_atoi(const char *str);

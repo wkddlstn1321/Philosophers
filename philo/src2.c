@@ -50,7 +50,9 @@ static int	must_eat_check(t_info *info)
 		i++;
 	if (i == info->num)
 	{
+		pthread_mutex_lock(&info->write);
 		info->die_flag = 1;
+		pthread_mutex_unlock(&info->write);
 		return (1);
 	}
 	return (0);

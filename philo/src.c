@@ -31,10 +31,20 @@ void	print_act(t_philo *phi, char *str)
 	pthread_mutex_unlock(&phi->info->write);
 }
 
-int	print_error(t_info *info)
+int	print_error(t_info *info, int idx)
 {
+	int	i;
+
+	i = 0;
 	if (info->fork != NULL)
+	{
+		while (i < idx + 1)
+		{
+			pthread_mutex_destroy(&info->fork[i]);
+			i++;
+		}
 		free(info->fork);
+	}
 	if (info->phi != NULL)
 		free(info->phi);
 	printf("error! error!!!!\n");

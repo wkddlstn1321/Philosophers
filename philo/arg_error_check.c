@@ -20,11 +20,11 @@ static int	info_init(t_info *info)
 	info->fork = (t_pmt *)malloc(sizeof(t_pmt) * info->num);
 	info->phi = (t_philo *)malloc(sizeof(t_philo) * info->num);
 	if (info->fork == NULL || info->phi == NULL)
-		return (print_error(info));
+		return (print_error(info, -1));
 	while (i < info->num)
 	{
 		if (pthread_mutex_init(&info->fork[i], NULL) != 0)
-			return (print_error(info));
+			return (print_error(info, i));
 		info->phi[i].left = i;
 		info->phi[i].right = i + 1;
 		if (info->phi[i].right == info->num)
@@ -35,7 +35,7 @@ static int	info_init(t_info *info)
 	}
 	info->all_sit_flag = 1;
 	if (pthread_mutex_init(&info->write, NULL) != 0)
-		return (print_error(info));
+		return (print_error(info, -1));
 	return (0);
 }
 
@@ -43,7 +43,7 @@ static int	range_check(char *str)
 {
 	long	num;
 
-	if (ft_strlen(str) > 10)
+	if (ft_strlen(str) > 11)
 		return (1);
 	num = ft_atoi(str);
 	if (num == -1 || num > 2147483647)
@@ -56,17 +56,17 @@ int	arg_check(int ac, char **av, t_info *info)
 	int	i;
 
 	if (ac != 5 && ac != 6)
-		return (print_error(info));
+		return (print_error(info, -1));
 	i = 1;
 	while (i < ac)
 	{
 		if (range_check(av[i]))
-			return (print_error(info));
+			return (print_error(info, -1));
 		i++;
 	}
 	info->num = ft_atoi(av[1]);
 	if (info->num < 1)
-		return (print_error(info));
+		return (print_error(info, -1));
 	info->time_to_die = ft_atoi(av[2]);
 	info->time_to_eat = ft_atoi(av[3]);
 	info->time_to_sleep = ft_atoi(av[4]);
@@ -74,5 +74,7 @@ int	arg_check(int ac, char **av, t_info *info)
 		info->must_eat = -1;
 	else
 		info->must_eat = ft_atoi(av[5]);
+	if (info->must_eat == 0)
+		return (1);
 	return (info_init(info));
 }

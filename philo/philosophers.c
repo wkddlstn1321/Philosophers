@@ -87,12 +87,6 @@ int	main(int argc, char **argv)
 	info.phi = NULL;
 	if (arg_check(argc, argv, &info))
 		return (0);
-	if (info.must_eat == 0)
-	{
-		free(info.phi);
-		free(info.fork);
-		return (0);
-	}
 	if (thread_create(&info))
 		return (0);
 	while (end_check(&info))
