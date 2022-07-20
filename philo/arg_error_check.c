@@ -12,6 +12,24 @@
 
 #include"philosophers.h"
 
+static int	mutx_init(t_info *info)
+{
+	if (pthread_mutex_init(&info->write, NULL) != 0)
+		return (print_error(info, info->num));
+	if (pthread_mutex_init(&info->eat_check, NULL) != 0)
+	{
+		pthread_mutex_destroy(&info->write);
+		return (print_error(info, info->num));
+	}
+	if (pthread_mutex_init(&info->die_check, NULL) != 0)
+	{
+		pthread_mutex_destroy(&info->write);
+		pthread_mutex_destroy(&info->eat_check);
+		return (print_error(info, info->num));
+	}
+	return (0);
+}
+
 static int	info_init(t_info *info)
 {
 	int	i;
@@ -34,9 +52,7 @@ static int	info_init(t_info *info)
 		i++;
 	}
 	info->all_sit_flag = 1;
-	if (pthread_mutex_init(&info->write, NULL) != 0)
-		return (print_error(info, -1));
-	return (0);
+	return (mutx_init(info));
 }
 
 static int	range_check(char *str)

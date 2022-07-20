@@ -48,14 +48,14 @@ void	*rt(void *v_phi)
 		else
 			usleep((phi->info->time_to_eat - 10) * 1000);
 	}
-	while (!phi->info->die_flag)
+	while (1)
 	{
+		pthread_mutex_lock(&phi->info->die_check);
+		if (phi->info->die_flag)
+			break ;
+		pthread_mutex_unlock(&phi->info->die_check);
 		philo_eat(phi);
-		if (phi->info->die_flag)
-			return (0);
 		philo_sleep(phi);
-		if (phi->info->die_flag)
-			return (0);
 		print_act(phi, "is thinking");
 	}
 	return (0);

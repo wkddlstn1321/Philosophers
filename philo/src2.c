@@ -50,8 +50,10 @@ static int	must_eat_check(t_info *info)
 		i++;
 	if (i == info->num)
 	{
+		pthread_mutex_lock(&info->die_check);
 		pthread_mutex_lock(&info->write);
 		info->die_flag = 1;
+		pthread_mutex_unlock(&info->die_check);
 		pthread_mutex_unlock(&info->write);
 		return (1);
 	}
@@ -85,6 +87,7 @@ int	end_check(t_info *info)
 		}
 		if (info->phi[i].last_eat_time > 0)
 		{
+			
 			if (get_time() - info->phi[i].last_eat_time >= die_t)
 			{
 				print_die(&info->phi[i]);

@@ -12,7 +12,7 @@
 
 NAME	= philo
 CC		= cc
-CFLAGS	= -Wall -Wextra -Werror -fsanitize=thread
+CFLAGS	= -Wall -Wextra -Werror #-fsanitize=thread
 SRCS	= philosophers.c \
 		  arg_error_check.c \
 		  src.c \

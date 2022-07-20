@@ -41,6 +41,8 @@ typedef struct p_info{
 	int			all_sit_flag;
 	t_pmt		write;
 	t_pmt		*fork;
+	t_pmt		eat_check;
+	t_pmt		die_check;
 	t_philo		*phi;
 }t_info;
 
