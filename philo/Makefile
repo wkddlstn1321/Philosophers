@@ -11,8 +11,8 @@
 # **************************************************************************** #
 
 NAME	= philo
-CC		= gcc
-CFLAGS	= -Wall -Wextra -Werror
+CC		= cc
+CFLAGS	= -Wall -Wextra -Werror -fsanitize=thread
 SRCS	= philosophers.c \
 		  arg_error_check.c \
 		  src.c \
@@ -22,7 +22,7 @@ OBJS	= $(SRCS:.c=.o)
 HEAD	= philosophers.h
 
 $(NAME) : $(OBJS)
-	$(CC) $^ -o $(NAME)
+	$(CC) $(CFLAGS) $^ -o $(NAME)
 
 all : $(NAME)
 
@@ -35,6 +35,8 @@ clean :
 fclean : clean
 	rm -f $(NAME)
 
-re : fclean all
+re :
+	make fclean
+	make all
 
 .PHONY : all clean fclean re

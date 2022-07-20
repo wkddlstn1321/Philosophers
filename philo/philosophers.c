@@ -19,7 +19,7 @@ void	thread_free(t_info *info)
 	i = 0;
 	while (i < info->num)
 	{
-		pthread_join(info->phi->philo, NULL);
+		pthread_join(info->phi[i].philo, NULL);
 		i++;
 	}
 	i = 0;
