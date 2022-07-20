@@ -15,18 +15,15 @@
 static int	mutx_init(t_info *info)
 {
 	if (pthread_mutex_init(&info->write, NULL) != 0)
-		return (print_error(info, info->num));
-	if (pthread_mutex_init(&info->eat_check, NULL) != 0)
-	{
-		pthread_mutex_destroy(&info->write);
-		return (print_error(info, info->num));
-	}
+		return (print_error(info));
+	if (pthread_mutex_init(&info->eat_t_check, NULL) != 0)
+		return (print_error(info));
 	if (pthread_mutex_init(&info->die_check, NULL) != 0)
-	{
-		pthread_mutex_destroy(&info->write);
-		pthread_mutex_destroy(&info->eat_check);
-		return (print_error(info, info->num));
-	}
+		return (print_error(info));
+	if (pthread_mutex_init(&info->eat_c_check, NULL) != 0)
+		return (print_error(info));
+	if (pthread_mutex_init(&info->all_seat, NULL) != 0)
+		return (print_error(info));
 	return (0);
 }
 
@@ -38,11 +35,11 @@ static int	info_init(t_info *info)
 	info->fork = (t_pmt *)malloc(sizeof(t_pmt) * info->num);
 	info->phi = (t_philo *)malloc(sizeof(t_philo) * info->num);
 	if (info->fork == NULL || info->phi == NULL)
-		return (print_error(info, -1));
+		return (print_error(info));
 	while (i < info->num)
 	{
 		if (pthread_mutex_init(&info->fork[i], NULL) != 0)
-			return (print_error(info, i));
+			return (print_error(info));
 		info->phi[i].left = i;
 		info->phi[i].right = i + 1;
 		if (info->phi[i].right == info->num)
@@ -51,7 +48,6 @@ static int	info_init(t_info *info)
 		info->phi[i].info = info;
 		i++;
 	}
-	info->all_sit_flag = 1;
 	return (mutx_init(info));
 }
 
@@ -72,17 +68,17 @@ int	arg_check(int ac, char **av, t_info *info)
 	int	i;
 
 	if (ac != 5 && ac != 6)
-		return (print_error(info, -1));
+		return (print_error(info));
 	i = 1;
 	while (i < ac)
 	{
 		if (range_check(av[i]))
-			return (print_error(info, -1));
+			return (print_error(info));
 		i++;
 	}
 	info->num = ft_atoi(av[1]);
 	if (info->num < 1)
-		return (print_error(info, -1));
+		return (print_error(info));
 	info->time_to_die = ft_atoi(av[2]);
 	info->time_to_eat = ft_atoi(av[3]);
 	info->time_to_sleep = ft_atoi(av[4]);

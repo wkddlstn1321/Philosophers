@@ -21,14 +21,20 @@ void	philo_eat(t_philo *phi)
 	pthread_mutex_lock(&phi->info->fork[phi->right]);
 	print_act(phi, "has taken a fork");
 	print_act(phi, "is eating");
+	pthread_mutex_lock(&phi->info->eat_t_check);
 	phi->last_eat_time = get_time();
+	pthread_mutex_unlock(&phi->info->eat_t_check);
 	start = get_time();
 	while (get_time() - start < phi->info->time_to_eat)
 		usleep(50);
 	pthread_mutex_unlock(&phi->info->fork[phi->left]);
 	pthread_mutex_unlock(&phi->info->fork[phi->right]);
 	if (phi->info->must_eat != -1)
+	{
+		pthread_mutex_lock(&phi->info->eat_c_check);
 		phi->eat_cnt++;
+		pthread_mutex_unlock(&phi->info->eat_c_check);
+	}
 }
 
 void	philo_sleep(t_philo *phi)
@@ -46,12 +52,18 @@ static int	must_eat_check(t_info *info)
 	int	i;
 
 	i = 0;
-	while (info->must_eat <= info->phi[i].eat_cnt)
+	while (i < info->num)
+	{
+		pthread_mutex_lock(&info->eat_c_check);
+		if (info->must_eat > info->phi[i].eat_cnt)
+			break ;
+		pthread_mutex_unlock(&info->eat_c_check);
 		i++;
+	}
 	if (i == info->num)
 	{
-		pthread_mutex_lock(&info->die_check);
 		pthread_mutex_lock(&info->write);
+		pthread_mutex_lock(&info->die_check);
 		info->die_flag = 1;
 		pthread_mutex_unlock(&info->die_check);
 		pthread_mutex_unlock(&info->write);
@@ -66,7 +78,9 @@ static void	print_die(t_philo *phi)
 
 	t = phi->info->start_time;
 	pthread_mutex_lock(&phi->info->write);
+	pthread_mutex_lock(&phi->info->die_check);
 	phi->info->die_flag = 1;
+	pthread_mutex_unlock(&phi->info->die_check);
 	printf("%ld %d is died\n", get_time() - t, phi->left + 1);
 	pthread_mutex_unlock(&phi->info->write);
 }
@@ -75,6 +89,7 @@ int	end_check(t_info *info)
 {
 	int		i;
 	long	die_t;
+	long	eat_t;
 
 	i = 0;
 	die_t = info->time_to_die;
@@ -85,10 +100,12 @@ int	end_check(t_info *info)
 			if (must_eat_check(info))
 				return (0);
 		}
-		if (info->phi[i].last_eat_time > 0)
+		pthread_mutex_lock(&info->eat_t_check);
+		eat_t = info->phi[i].last_eat_time;
+		pthread_mutex_unlock(&info->eat_t_check);
+		if (eat_t > 0)
 		{
-			
-			if (get_time() - info->phi[i].last_eat_time >= die_t)
+			if (get_time() - eat_t >= die_t)
 			{
 				print_die(&info->phi[i]);
 				return (0);
