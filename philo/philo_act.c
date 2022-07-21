@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_act.c                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: insjang <insjang@student.42.fr>            +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/07/21 16:08:09 by insjang           #+#    #+#             */
+/*   Updated: 2022/07/21 16:08:15 by insjang          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include"philosophers.h"
 
 int	philo_loop(t_philo *phi)
@@ -55,9 +67,7 @@ void	print_act(t_philo *phi, char *str)
 	long	t;
 	int		d;
 
-
 	t = phi->info->start_time;
-	
 	pthread_mutex_lock(&phi->info->die_check);
 	d = phi->info->die_flag;
 	pthread_mutex_unlock(&phi->info->die_check);

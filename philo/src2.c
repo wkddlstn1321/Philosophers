@@ -12,6 +12,39 @@
 
 #include"philosophers.h"
 
+static void	print_die(t_philo *phi)
+{
+	long	t;
+
+	t = phi->info->start_time;
+	pthread_mutex_lock(&phi->info->die_check);
+	phi->info->die_flag = 1;
+	pthread_mutex_unlock(&phi->info->die_check);
+	pthread_mutex_lock(&phi->info->write);
+	printf("%ld %d is died\n", get_time() - t, phi->left + 1);
+	pthread_mutex_unlock(&phi->info->write);
+}
+
+static int	last_eat_check(t_info *info, int i)
+{
+	long	eat_t;
+	long	die_t;
+
+	die_t = info->time_to_die;
+	pthread_mutex_lock(&info->eat_t_check);
+	eat_t = info->phi[i].last_eat_time;
+	pthread_mutex_unlock(&info->eat_t_check);
+	if (eat_t > 0)
+	{
+		if (get_time() - eat_t >= die_t)
+		{
+			print_die(&info->phi[i]);
+			return (1);
+		}
+	}
+	return (0);
+}
+
 static int	must_eat_check(t_info *info)
 {
 	int	i;
@@ -37,27 +70,11 @@ static int	must_eat_check(t_info *info)
 	return (0);
 }
 
-static void	print_die(t_philo *phi)
-{
-	long	t;
-
-	t = phi->info->start_time;
-	pthread_mutex_lock(&phi->info->die_check);
-	phi->info->die_flag = 1;
-	pthread_mutex_unlock(&phi->info->die_check);
-	pthread_mutex_lock(&phi->info->write);
-	printf("%ld %d is died\n", get_time() - t, phi->left + 1);
-	pthread_mutex_unlock(&phi->info->write);
-}
-
 int	end_check(t_info *info)
 {
 	int		i;
-	long	die_t;
-	long	eat_t;
 
 	i = 0;
-	die_t = info->time_to_die;
 	while (i < info->num)
 	{
 		if (info->must_eat != -1)
@@ -65,17 +82,8 @@ int	end_check(t_info *info)
 			if (must_eat_check(info))
 				return (0);
 		}
-		pthread_mutex_lock(&info->eat_t_check);
-		eat_t = info->phi[i].last_eat_time;
-		pthread_mutex_unlock(&info->eat_t_check);
-		if (eat_t > 0)
-		{
-			if (get_time() - eat_t >= die_t)
-			{
-				print_die(&info->phi[i]);
-				return (0);
-			}
-		}
+		if (last_eat_check(info, i))
+			return (0);
 		i++;
 	}
 	usleep(50);
