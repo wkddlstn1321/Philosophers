@@ -44,7 +44,9 @@ void	*rt(void *v_phi)
 	phi = (t_philo *)v_phi;
 	pthread_mutex_lock(&phi->info->all_seat);
 	pthread_mutex_unlock(&phi->info->all_seat);
+	pthread_mutex_lock(&phi->info->eat_t_check);
 	phi->last_eat_time = phi->info->start_time;
+	pthread_mutex_unlock(&phi->info->eat_t_check);
 	if (phi->left % 2)
 	{
 		if (phi->info->time_to_eat <= 10)
@@ -54,15 +56,8 @@ void	*rt(void *v_phi)
 	}
 	while (1)
 	{
-		pthread_mutex_lock(&phi->info->write);
-		pthread_mutex_lock(&phi->info->die_check);
-		if (phi->info->die_flag)
+		if (philo_loop(phi))
 			break ;
-		pthread_mutex_unlock(&phi->info->die_check);
-		pthread_mutex_unlock(&phi->info->write);
-		philo_eat(phi);
-		philo_sleep(phi);
-		print_act(phi, "is thinking");
 	}
 	return (0);
 }
@@ -79,7 +74,6 @@ int	thread_create(t_info *info)
 		if (pthread_create(&info->phi[i].philo, NULL, &rt, &info->phi[i]) != 0)
 			return (print_error(info));
 		i++;
-		usleep(50);
 	}
 	info->start_time = get_time();
 	pthread_mutex_unlock(&info->all_seat);

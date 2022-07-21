@@ -12,61 +12,26 @@
 
 #include"philosophers.h"
 
-void	philo_eat(t_philo *phi)
-{
-	long	start;
-
-	pthread_mutex_lock(&phi->info->fork[phi->left]);
-	print_act(phi, "has taken a fork");
-	pthread_mutex_lock(&phi->info->fork[phi->right]);
-	print_act(phi, "has taken a fork");
-	print_act(phi, "is eating");
-	pthread_mutex_lock(&phi->info->eat_t_check);
-	phi->last_eat_time = get_time();
-	pthread_mutex_unlock(&phi->info->eat_t_check);
-	start = get_time();
-	while (get_time() - start < phi->info->time_to_eat)
-		usleep(50);
-	pthread_mutex_unlock(&phi->info->fork[phi->left]);
-	pthread_mutex_unlock(&phi->info->fork[phi->right]);
-	if (phi->info->must_eat != -1)
-	{
-		pthread_mutex_lock(&phi->info->eat_c_check);
-		phi->eat_cnt++;
-		pthread_mutex_unlock(&phi->info->eat_c_check);
-	}
-}
-
-void	philo_sleep(t_philo *phi)
-{
-	long	start;
-
-	print_act(phi, "is sleeping");
-	start = get_time();
-	while (get_time() - start < phi->info->time_to_sleep)
-		usleep(50);
-}
-
 static int	must_eat_check(t_info *info)
 {
 	int	i;
+	int	eat;
 
 	i = 0;
 	while (i < info->num)
 	{
 		pthread_mutex_lock(&info->eat_c_check);
-		if (info->must_eat > info->phi[i].eat_cnt)
-			break ;
+		eat = info->phi[i].eat_cnt;
 		pthread_mutex_unlock(&info->eat_c_check);
+		if (info->must_eat > eat)
+			break ;
 		i++;
 	}
 	if (i == info->num)
 	{
-		pthread_mutex_lock(&info->write);
 		pthread_mutex_lock(&info->die_check);
 		info->die_flag = 1;
 		pthread_mutex_unlock(&info->die_check);
-		pthread_mutex_unlock(&info->write);
 		return (1);
 	}
 	return (0);
@@ -77,10 +42,10 @@ static void	print_die(t_philo *phi)
 	long	t;
 
 	t = phi->info->start_time;
-	pthread_mutex_lock(&phi->info->write);
 	pthread_mutex_lock(&phi->info->die_check);
 	phi->info->die_flag = 1;
 	pthread_mutex_unlock(&phi->info->die_check);
+	pthread_mutex_lock(&phi->info->write);
 	printf("%ld %d is died\n", get_time() - t, phi->left + 1);
 	pthread_mutex_unlock(&phi->info->write);
 }

@@ -12,11 +12,12 @@
 
 NAME	= philo
 CC		= cc
-CFLAGS	= -Wall -Wextra -Werror #-fsanitize=thread
+CFLAGS	= -Wall -Wextra -Werror
 SRCS	= philosophers.c \
 		  arg_error_check.c \
 		  src.c \
-		  src2.c
+		  src2.c \
+		  philo_act.c
 
 OBJS	= $(SRCS:.c=.o)
 HEAD	= philosophers.h

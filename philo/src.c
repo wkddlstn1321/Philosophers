@@ -20,19 +20,6 @@ long	get_time(void)
 	return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-void	print_act(t_philo *phi, char *str)
-{
-	long	t;
-
-	t = phi->info->start_time;
-	pthread_mutex_lock(&phi->info->write);
-	pthread_mutex_lock(&phi->info->die_check);
-	if (!phi->info->die_flag)
-		printf("%ld %d %s\n", get_time() - t, phi->left + 1, str);
-	pthread_mutex_unlock(&phi->info->die_check);
-	pthread_mutex_unlock(&phi->info->write);
-}
-
 int	print_error(t_info *info)
 {
 	if (info->fork != NULL)
