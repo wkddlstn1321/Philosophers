@@ -17,10 +17,10 @@ static void	print_die(t_philo *phi)
 	long	t;
 
 	t = phi->info->start_time;
+	pthread_mutex_lock(&phi->info->write);
 	pthread_mutex_lock(&phi->info->die_check);
 	phi->info->die_flag = 1;
 	pthread_mutex_unlock(&phi->info->die_check);
-	pthread_mutex_lock(&phi->info->write);
 	printf("%ld %d is died\n", get_time() - t, phi->left + 1);
 	pthread_mutex_unlock(&phi->info->write);
 }

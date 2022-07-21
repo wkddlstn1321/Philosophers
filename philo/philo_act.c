@@ -68,10 +68,10 @@ void	print_act(t_philo *phi, char *str)
 	int		d;
 
 	t = phi->info->start_time;
+	pthread_mutex_lock(&phi->info->write);
 	pthread_mutex_lock(&phi->info->die_check);
 	d = phi->info->die_flag;
 	pthread_mutex_unlock(&phi->info->die_check);
-	pthread_mutex_lock(&phi->info->write);
 	if (!d)
 		printf("%ld %d %s\n", get_time() - t, phi->left + 1, str);
 	pthread_mutex_unlock(&phi->info->write);
