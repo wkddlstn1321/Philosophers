@@ -58,6 +58,17 @@ int	thread_create(t_info *info)
 ```cc
 int pthread_create(pthread_t *thread, const pthread_attr_t *arr, void *(*start_routine(void *), void *arg)
 ```
-위 함수는 스레드 생성과 동시에 인자로 받은 start_routine 함수를 생성한 스레드에서 실행시키는데 해당 함수에 인자로 보낼수 있는 값이 하나밖에 없다.
+위 함수는 스레드 생성과 동시에 인자로 받은 start_routine 함수를 생성한 스레드에서 실행시키는데
+
+해당 함수에 인자로 보낼수 있는 값이 마지막 인자인 void *arg 하나밖에 없다.
+
 과제에서는 전역변수가 금지 되기 때문에 새롭게 생성되는 스레드는 main 스레드에서 하나의 인자만을 받아올 수 있는데 이부분에서 고민을 많이 했었다. 
+
+보낼 인자로 파싱 때 미리 저장해 놓은 아래 두개의 구조체가 필요했는데 
+ * p_philo
+ * p_info
+
+philo 에는 각 스레드가 독립적으로 가지고 있을 철학자 한명의 정보
+
+info에는 철학자의 수 먹을 때 걸리는 시간 등 프로그램 실행할 받은 인자들의 정보이다.
 
