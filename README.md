@@ -4,7 +4,8 @@ https://ko.wikipedia.org/wiki/%EC%8B%9D%EC%82%AC%ED%95%98%EB%8A%94_%EC%B2%A0%ED%
 
 ---
 식사하는 철학자 문제를 통해 프로세스 스레딩을 다루는 방법을 익히는 과제로
-과제의 요구사항과 필요한 개념 지식들은 아래 링크에 정리해 뒀다.
+
+해당 과제의 요구사항과 필요한 개념 지식들은 아래 링크에 정리해 뒀다.
 
 https://www.notion.so/Philosophers-cd0252edca9a476bac92f4dd9d37bc00
 
@@ -13,7 +14,7 @@ https://www.notion.so/Philosophers-cd0252edca9a476bac92f4dd9d37bc00
 
 ### 코드 흐름 
 1. 파싱
-```
+```cc
 // 파싱 코드중 일부
 info->num = ft_atoi(av[1]);
 if (info->num < 1)
@@ -33,7 +34,7 @@ return (info_init(info));
 파싱 부분은 어렵지 않다. 들어 오는 인자에 대해서 처리하면 되는 비교적 간단한 부분
 
 2. 스레드 생성
-```
+```cc
 int	thread_create(t_info *info)
 {
 	int	i;
@@ -52,3 +53,11 @@ int	thread_create(t_info *info)
 	return (0);
 }
 ```
+구현하기가 생각보다 까다로웠던 부분인데 그 이유는 pthread_create 함수 때문이다.
+
+```cc
+int pthread_create(pthread_t *thread, const pthread_attr_t *arr, void *(*start_routine(void *), void *arg)
+```
+위 함수는 스레드 생성과 동시에 인자로 받은 start_routine 함수를 생성한 스레드에서 실행시키는데 해당 함수에 인자로 보낼수 있는 값이 하나밖에 없다.
+과제에서는 전역변수가 금지 되기 때문에 새롭게 생성되는 스레드는 main 스레드에서 하나의 인자만을 받아올 수 있는데 이부분에서 고민을 많이 했었다. 
+
