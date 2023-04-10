@@ -13,7 +13,7 @@ https://www.notion.so/Philosophers-cd0252edca9a476bac92f4dd9d37bc00
 일정한 방향으로 철학자들에게 순서대로 번호를 부여하고 해당 번호가 홀수 또는 짝수인 철학자들이 먼저 식사를 하게 하면 규착 상태 발생 필수 조건중 하나인 점유대기를 방지함으로 교착 상태를 막을 수 있다.
 
 ### 코드 흐름 
-1. 파싱
+* 1. 파싱
 ```cc
 // 파싱 코드중 일부
 info->num = ft_atoi(av[1]);
@@ -33,7 +33,7 @@ return (info_init(info));
 ```
 파싱 부분은 어렵지 않다. 들어 오는 인자에 대해서 처리하면 되는 비교적 간단한 부분
 
-2. 스레드 생성
+* 2. 스레드 생성
 ```cc
 int	thread_create(t_info *info)
 {
@@ -94,4 +94,114 @@ typedef struct p_info{
 // 프로그램 실행할 받은 인자를 파싱한 초기 세팅 값 및 뮤텍스 변수
 ```
 
+info를 인자로 보내면 각 스레드가 자신이 몇번째 철학자인지 알 수 없고
+
+philo를 인자로 보내면 info에 포함되어 있는 변수들을 사용할 수 없다.
+
+데이터 레이스를 피하기 위해서는 뮤텍스 변수를 반드시 공유할 수 있어야 하기에 info를 보내는 쪽으로 고민하다 
+
+philo 구조체에 info에 주소를 포함하는 변수를 추가하는것으로 간단하게 해결했다.
+
+` struct p_info	*info; // 해당 코드를 philo 구조체에 추가 `
+
+
+
+* 3. 스레드 루틴
+
+```cc
+void	*rt(void *v_phi)
+{
+	t_philo	*phi;
+
+	phi = (t_philo *)v_phi;
+	pthread_mutex_lock(&phi->info->all_seat);        // 모든 철학자가 착석하기전 의리없이 먼저 식사하는 경우를 방지하기 위한 뮤텍스
+	pthread_mutex_unlock(&phi->info->all_seat);      // 스레드 생성 반복문이 끝날 때 메인 스레드에서 언락해준다.
+	pthread_mutex_lock(&phi->info->eat_t_check);
+	phi->last_eat_time = phi->info->start_time;
+	pthread_mutex_unlock(&phi->info->eat_t_check);
+	if (phi->left % 2)
+	{
+		// 철학자 수가 많아도 홀수 번째 철학자가 먼저 식사하는걸 최대한 보장해주기 위한 딜레이 계산 
+		if (phi->info->time_to_eat <= 10)
+			usleep(phi->info->time_to_eat * 900);
+		else
+			usleep((phi->info->time_to_eat - 10) * 1000); 
+	}
+	while (1)
+	{
+		if (philo_loop(phi))
+			break ;
+	}
+	return (0);
+}
+```
+
+스레드 생성과 동시에 시작되는 루틴 함수
+
+홀수 번째 철학자가 먼저 식사를 하고 이어서 짝수가 식사를 시작하는게 로직에 핵심이다
+
+이외의 부분은 퍼포먼스 향상을 위한 처리가 대부분
+
+philo_loop 에서 철학자가 죽기 전까지 먹고 자고 생각하는걸 반복하게 구현해줬다.
+
+* 4. 모니터링
+
+```cc
+int	end_check(t_info *info)
+{
+	int		i;
+
+	i = 0;
+	while (i < info->num)
+	{
+		if (info->must_eat != -1)
+		{
+			if (must_eat_check(info)) // 최소 식사 조건 만족했는지 확인
+				return (0);
+		}
+		if (last_eat_check(info, i))      // 마지막 식사시작 시간 이후 부터 현재까지의 시간을 확인
+			return (0);
+		i++;
+	}
+	usleep(50);
+	return (1);
+}
+```
+
+과제 요구사항에 의해 철학자는 다른 철학자들에 죽음을 알 수 없다.
+main 스레드에서 각 철학자들에 상태를 모니터링 하다가 사망자 발생시 사망 플래그를 켜준다.
+
+데드락 방지만큼이나 중요한 부분이다 공유자원에 대한 접근이 많다 보니 뮤텍스 변수를 잘 관리해주지 않으면 데이터레이스가 발생하기 쉽다.
+
+* 5. 스레드 해제
+```cc
+void	thread_free(t_info *info)
+{
+	int	i;
+
+	i = 0;
+	while (i < info->num)
+	{
+		pthread_join(info->phi[i].philo, NULL);
+		i++;
+	}
+	i = 0;
+	while (i < info->num)
+	{
+		pthread_mutex_destroy(&info->fork[i]);
+		i++;
+	}
+	pthread_mutex_destroy(&info->write);
+	pthread_mutex_destroy(&info->eat_c_check);
+	pthread_mutex_destroy(&info->eat_t_check);
+	pthread_mutex_destroy(&info->die_check);
+	pthread_mutex_destroy(&info->all_seat);
+	free(info->phi);
+	free(info->fork);
+}
+```
+
+마지막으로 스레드를 해제해 준다
+
+스레드 해제를 위한 함수는 detach 와 join이 있는데 detach는 빠르고 join은 안전한 느낌이라 join으로 스레드 해제를 해줬다.
 
