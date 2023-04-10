@@ -173,6 +173,28 @@ main 스레드에서 각 철학자들에 상태를 모니터링 하다가 사망
 
 데드락 방지만큼이나 중요한 부분이다 공유자원에 대한 접근이 많다 보니 뮤텍스 변수를 잘 관리해주지 않으면 데이터레이스가 발생하기 쉽다.
 
+출력 부분도 상당한 시간을 투자했었는데 죽음에 대한 출력 이후에 다른 행동들에 대한 출력이 발생해 요구사항에 위배되는 경우가 종종 생겼다.
+
+이론상 출력 이전에 생존 플래그를 미리 확인하고 생존 상태일때만 출력을 하고 출력 전후로 뮤텍스 관리를 해주는데 출력이 섞이는게 의아했었는데
+
+생존 플래그를 통해 생존 상태임을 확인, 이후 행동에 대한 출력 직전에 뮤텍스락이 걸리면 해당 경우가 발생하는걸 확인
+
+이중 뮤텍스 락으로 구현하는걸로 해결했다.
+
+```cc
+	//행동에 대한 출력
+	pthread_mutex_lock(&phi->info->write);              1 출력 잠금
+	pthread_mutex_lock(&phi->info->die_check);          2 생존 플래그 확인
+	d = phi->info->die_flag;
+	pthread_mutex_unlock(&phi->info->die_check);        2 생존 플래그 확인 후 해제
+	if (!d)
+		printf("%ld %d %s\n", get_time() - t, phi->left + 1, str);
+	pthread_mutex_unlock(&phi->info->write);             1 출력 해제
+```
+
+
+
+
 * 5. 스레드 해제
 ```cc
 void	thread_free(t_info *info)
