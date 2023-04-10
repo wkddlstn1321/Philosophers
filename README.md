@@ -227,6 +227,7 @@ void	thread_free(t_info *info)
 
 스레드 해제를 위한 함수는 detach 와 join이 있는데 detach는 빠르고 join은 안전한 느낌이라 join으로 스레드 해제를 해줬다.
 
+---
 ### 해결
 
 구현 난이도가 어려운편은 아니였지만 스레드 개념이 부족해서 많이 삽질했던 과제
