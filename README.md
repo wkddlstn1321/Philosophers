@@ -65,10 +65,33 @@ int pthread_create(pthread_t *thread, const pthread_attr_t *arr, void *(*start_r
 과제에서는 전역변수가 금지 되기 때문에 새롭게 생성되는 스레드는 main 스레드에서 하나의 인자만을 받아올 수 있는데 이부분에서 고민을 많이 했었다. 
 
 보낼 인자로 파싱 때 미리 저장해 놓은 아래 두개의 구조체가 필요했는데 
- * p_philo
- * p_info
+```cc
+typedef struct p_philo{
+	int				left;
+	int				right;
+	int				eat_cnt;
+	long			last_eat_time;
+	pthread_t		philo;
+}t_philo;
+// 각 스레드가 독립적으로 가지고 있을 철학자 한명의 정보
 
-philo 에는 각 스레드가 독립적으로 가지고 있을 철학자 한명의 정보
+typedef struct p_info{
+	int			num;
+	int			time_to_die;
+	int			time_to_eat;
+	int			time_to_sleep;
+	int			must_eat;
+	int			die_flag;
+	long		start_time;
+	t_pmt		write;
+	t_pmt		*fork;
+	t_pmt		eat_t_check;
+	t_pmt		eat_c_check;
+	t_pmt		die_check;
+	t_pmt		all_seat;
+	t_philo		*phi;
+}t_info;
+// 프로그램 실행할 받은 인자를 파싱한 초기 세팅 값 및 뮤텍스 변수
+```
 
-info에는 철학자의 수 먹을 때 걸리는 시간 등 프로그램 실행할 받은 인자들의 정보이다.
 
